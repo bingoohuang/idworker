@@ -31,6 +31,8 @@ This id of type long is composited by three segments:
 
 We left one first bit to be zero and keep the generated ids always positive. 
 
+The performance show that idworker can generate 1000000 ids in 489 ms, or 2,044,990 ids/second.
+
 ## Rationale
 
 I have to confess that the orignial idea is from [twitter snowflake](https://github.com/twitter/snowflake).
