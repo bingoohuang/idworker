@@ -45,10 +45,14 @@ Here I made this different.
 
 According to my design, the embedded idworker client will only need to access the idworker server on its first running to get an unique workerid. And then the client store the worker id at local disk. When the client restarted, it will try to find available worker id from the local disk. If it got, the local file of worker id will be `locked`. The lock will be held until the process ends or the client releases it as needed.
 
-If the client can not find available worker id at local disk and meanwhile the server is gone, the client will try to use the last 10 bits of host ipv4 as to be the worker id. When the worker id of last 10 bits of host is still unvailable, the client will generate a mask of max worker number and to generate a `dangerous` worker id which is only unique at current host rather than globally unique.
+If the client can not find available worker id at local disk and meanwhile the server is gone, the client will try to use the last 10 bits of host ipv4 as to be the worker id. When the worker id of last 10 bits of host is still unvailable, the client will generate a random mask of max worker number and to generate a `dangerous` worker id which is only unique at current host rather than globally unique.
+
+## The idworker server
+The idworker server is just a simple servlet running in embedded jetty container.
+The server is only needed when a new client process can find a pre-allocated workerid. And this situation happens only when a new process is deployed, or the local disk changed, or the local workerid files are cleared.
+
 
 ## Protocol between client and server
-The idworker server is just a simple servlet running in embedded jetty container.
 
 > see
 
