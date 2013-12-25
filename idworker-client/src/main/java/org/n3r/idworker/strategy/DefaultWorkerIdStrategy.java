@@ -175,4 +175,9 @@ public class DefaultWorkerIdStrategy implements WorkerIdStatrategy {
     public long availableWorkerId() {
         return workerId;
     }
+
+    @Override
+    public void release() {
+        fileLock.destroy();
+    }
 }

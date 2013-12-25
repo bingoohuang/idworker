@@ -61,7 +61,8 @@ public class IdWorker {
         }
 
         lastTimestamp = timestamp;
-        return ((timestamp - getEpoch()) << timestampLeftShift) |
+        long diff = timestamp - getEpoch();
+        return (diff << timestampLeftShift) |
                 (workerId << workerIdShift) |
                 sequence;
     }

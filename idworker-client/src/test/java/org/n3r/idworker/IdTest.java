@@ -3,6 +3,7 @@ package org.n3r.idworker;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.n3r.idworker.strategy.DefaultWorkerIdStrategy;
 import org.n3r.idworker.utils.Ip;
 
 import java.io.File;
@@ -15,13 +16,21 @@ public class IdTest {
     @BeforeClass
     public static void beforeClass() {
         String pathname = System.getProperty("user.home") + File.separator + ".idworkers";
-        new File(pathname).mkdir();
+        File dir = new File(pathname);
+        dir.mkdir();
+
+        for (File f : dir.listFiles()) {
+            f.delete();
+        }
+
         String ipdotlock = Ip.ip + ".lock.0112";
         try {
             new File(pathname, ipdotlock).createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Id.configure(new DefaultWorkerIdStrategy());
     }
 
     @AfterClass
