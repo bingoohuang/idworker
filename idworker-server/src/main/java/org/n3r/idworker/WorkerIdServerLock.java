@@ -39,31 +39,55 @@ public class WorkerIdServerLock {
 
     }
 
-    public static long current() {
-        return currentIndex;
+    public static String current() {
+        return String.format("%04d", currentIndex);
     }
 
     static long workerIdBits = 10L;
     static long maxWorkerId = -1L ^ (-1L << workerIdBits);
 
     private static synchronized long increment() {
-        long nextIndex = currentIndex + 1;
-        if (nextIndex == maxWorkerId) nextIndex = 0;
+        long nextIndex = currentIndex;
+        int cycledTimes = 0;
+
+        while (isUsedAlreadly(nextIndex) && cycledTimes < 2) {
+            if (++nextIndex == maxWorkerId) {
+                nextIndex = 0;
+                ++cycledTimes;
+            }
+        }
+
+        if (cycledTimes >= 2) {
+            logger.error("worker ids are used-up");
+            throw new RuntimeException("worker ids are used-up");
+        }
 
         globalWorkerIdFileServerLock.setIndex(nextIndex);
         currentIndex = nextIndex;
         return currentIndex;
     }
 
-    public static synchronized String increment(String ip) {
+    private static boolean isUsedAlreadly(long nextIndex) {
+        String indexStr = String.format("%04d", nextIndex);
+
+        for (File file : dir.listFiles()) {
+            Matcher matcher = lockFilePattern.matcher(file.getName());
+            if (!matcher.matches()) continue;
+
+
+            if (indexStr.equals(matcher.group(2))) return true;
+        }
+
+        return false;
+    }
+
+    public static String increment(String ip) {
         long newWorkerId = increment();
         String str = String.format("%04d", newWorkerId);
-        synchronized (ip) {
-            try {
-                new File(dir, ip + ".lock." + str).createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            new File(dir, ip + ".lock." + str).createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return str;
@@ -117,6 +141,21 @@ public class WorkerIdServerLock {
         }
 
         return sb.toString();
+    }
+
+
+    public static String sync(String ip, String workerIds) {
+        try {
+            if (workerIds != null && !workerIds.isEmpty()) {
+                String[] ids = workerIds.split(",");
+                for (String id : ids)
+                    new File(dir, ip + ".lock." + id).createNewFile();
+            }
+
+            return list(ip);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

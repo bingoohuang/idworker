@@ -3,6 +3,7 @@ package org.n3r.idworker;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.n3r.idworker.utils.Ip;
 
 import java.io.File;
 import java.io.IOException;

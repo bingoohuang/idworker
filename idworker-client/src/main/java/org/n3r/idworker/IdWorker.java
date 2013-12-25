@@ -18,7 +18,7 @@ public class IdWorker {
 
     protected long lastTimestamp = -1L;
 
-    protected long workerId;
+    protected final long workerId;
     protected long sequence = 0L;
     protected Logger logger = LoggerFactory.getLogger(IdWorker.class);
 
@@ -61,7 +61,7 @@ public class IdWorker {
         }
 
         lastTimestamp = timestamp;
-        return ((timestamp - epoch) << timestampLeftShift) |
+        return ((timestamp - getEpoch()) << timestampLeftShift) |
                 (workerId << workerIdShift) |
                 sequence;
     }

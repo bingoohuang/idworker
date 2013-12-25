@@ -1,4 +1,4 @@
-package org.n3r.idworker;
+package org.n3r.idworker.strategy;
 
 
 import org.slf4j.Logger;
