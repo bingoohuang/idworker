@@ -66,19 +66,19 @@ The server is only needed when a new client process can find a pre-allocated wor
 + Usage: List all the ip-user and the worker ids allocated for the host.
 + Reponse: `10.192.202.115.bingoohuang:0010,0320,0311;10.192.202.125.bingoohuang:0110,0320`
 
-> list of one host
+> list of one ip and user
 
 + Request: `http://idworker-server-host:9223/list?ipu=10.192.202.115.bingoohuang`
 + Usage: List the worker ids allocated for the specified ip and user.
 + Reponse: `0010,0320,0311`
 
-> inc for one host
+> inc for one ip and user
 	
 + Request: `http://idworker-server-host:9223/inc?ipu=10.192.202.115.bingoohuang`
 + Usage: Allocate a new worker id for the specified ip and user.
 + Reponse: `0312`
 
-> sync of one host
+> sync of one ip and user
 
 + Request: `http://idworker-server-host:9223/sync?ipu=10.192.202.115.bingoohuang&ids=0010,0320,0311`
 + Usage: To synchronized all the ip and user specific worker ids between client and server.
