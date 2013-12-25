@@ -81,19 +81,21 @@ public class WorkerIdServerLock {
         return false;
     }
 
-    public static String increment(String ip) {
+    public static String incr(String ipu) {
         long newWorkerId = increment();
         String str = String.format("%04d", newWorkerId);
         try {
-            new File(dir, ip + ".lock." + str).createNewFile();
+            new File(dir, ipu + ".lock." + str).createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+        logger.info("create a new worker id {} for {}", str, ipu);
+
         return str;
     }
 
-    static Pattern lockFilePattern = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}).lock.(\\d{4})");
+    static Pattern lockFilePattern = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.[_\\d\\w-]+)\\.lock\\.(\\d{4})");
 
     public static String list() {
         StringBuilder ret = new StringBuilder();
@@ -125,9 +127,9 @@ public class WorkerIdServerLock {
         return ret.toString();
     }
 
-    public static String list(String ip) {
+    public static String list(String ipu) {
         StringBuilder sb = new StringBuilder();
-        String prefix = ip + ".lock.";
+        String prefix = ipu + ".lock.";
         int prefixSize = prefix.length();
         for (File file : dir.listFiles()) {
             // check the format like 10.142.1.151.lock.0001
@@ -144,15 +146,15 @@ public class WorkerIdServerLock {
     }
 
 
-    public static String sync(String ip, String workerIds) {
+    public static String sync(String ipu, String workerIds) {
         try {
             if (workerIds != null && !workerIds.isEmpty()) {
                 String[] ids = workerIds.split(",");
                 for (String id : ids)
-                    new File(dir, ip + ".lock." + id).createNewFile();
+                    new File(dir, ipu + ".lock." + id).createNewFile();
             }
 
-            return list(ip);
+            return list(ipu);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

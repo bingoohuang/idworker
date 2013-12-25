@@ -12,26 +12,26 @@ public class IdWorkerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
         StringBuilder answer = new StringBuilder();
-        String ip = req.getParameter("ip");
+        String ipu = req.getParameter("ipu");
         if (uri.equals("/list")) {
-            if (ip != null && ip.length() > 0) {
-                answer.append(WorkerIdServerLock.list(ip));
+            if (ipu != null && ipu.length() > 0) {
+                answer.append(WorkerIdServerLock.list(ipu));
             } else {
                 answer.append(WorkerIdServerLock.list());
             }
         } else if (uri.equals("/see")) {
             answer.append(WorkerIdServerLock.current());
         } else if (uri.equals("/inc")) {
-            if (ip != null && ip.length() > 0) {
-                String increment = WorkerIdServerLock.increment(ip);
+            if (ipu != null && ipu.length() > 0) {
+                String increment = WorkerIdServerLock.incr(ipu);
                 answer.append(increment);
             } else {
-                answer.append("ip is required");
+                answer.append("ipu is required");
             }
         } else if (uri.equals("/sync")) {
             String workerIds = req.getParameter("ids");
-            if (ip != null && ip.length() > 0 && workerIds != null && workerIds.length() > 0)
-                answer.append(WorkerIdServerLock.sync(ip, workerIds));
+            if (ipu != null && ipu.length() > 0 && workerIds != null && workerIds.length() > 0)
+                answer.append(WorkerIdServerLock.sync(ipu, workerIds));
         } else {
             answer.append("bad request");
         }

@@ -11,8 +11,11 @@ public class Id {
     }
 
     public static synchronized void configure(WorkerIdStatrategy custom) {
+        if (workerIdStrategy == custom) return;
+
         if (workerIdStrategy != null) workerIdStrategy.release();
         workerIdStrategy = custom;
+        workerIdStrategy.initialize();
         idWorker = new IdWorker(workerIdStrategy.availableWorkerId());
     }
 

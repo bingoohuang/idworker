@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.OverlappingFileLockException;
 
@@ -76,6 +77,8 @@ public class FileLock {
             if (flock == null) return;
             try {
                 flock.release();
+            } catch (ClosedChannelException e) {
+                // Ignore
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
