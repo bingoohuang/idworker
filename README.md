@@ -33,19 +33,19 @@ We left one first bit to be zero and keep the generated ids always positive.
 
 ## Rationale
 
-And I have to confess the orignial idea is from [twitter snowflake](https://github.com/twitter/snowflake).
+And I have to confess that the orignial idea is from [twitter snowflake](https://github.com/twitter/snowflake).
 
-Within one process, we are of course sure it is simple to make all IDs generated are unique. But with multiple processes on the one host, or even on multiple hosts, how to guarentee the global uniqueness? 
+Within one process, we are of course sure it is simple to make all IDs generated unique. But within multiple processes on the one host, or even on multiple hosts, how to guarentee such global uniqueness? 
 
-As you already known, the worker id segment is used to rescue the distributed unique conditions. If each process has a unique worker id, all the generated IDs of each process will be globally unique, whenever multiple processes on one host or among multiple hosts.
+As you already known, the worker id segment is used to rescue the distributed unique condition. If each process has a unique worker id, all the generated IDs of each process will be globally unique, whenever multiple processes on one host or among multiple distributed hosts.
 
-Snowflake deployed there ID online services, and among these services, zk is used to keep every worker id is unique. And when anybody want a new ID, the access the ID online services by THRIFT.
+Snowflake deployed their ID online services, and Zookeeper is used internally to keep every worker id is unique. And when anybody want a new ID, just access to the ID online services by THRIFT.
 
-Here I made this different.
+Here I made this different and try to make more simple.
 
-According to my design, the embedded idworker client will only need to access the idworker server on its first running to get an unique workerid. And then the client store the worker id at local disk. When the client restarted, it will try to find available worker id from the local disk. If it got, the local file of worker id will be `locked`. The lock will be held until the process ends or the client releases it as needed.
+According to my design, the embedded idworker client will only need to access the idworker server on its first running to get an unique workerid. And then the client will store the worker id at local disk. When the client restarted, it will try to find available worker id from the local disk files. If it got, the local file of worker id will be `locked` excludedly. The lock will be held until the process ends or the client releases it as needed.
 
-If the client can not find available worker id at local disk and meanwhile the server is gone, the client will try to use the last 10 bits of host ipv4 as to be the worker id. When the worker id of last 10 bits of host is still unvailable, the client will generate a random mask of max worker number and to generate a `dangerous` worker id which is only unique at current host rather than globally unique.
+If the client can not find available worker id at local disk file and meanwhile the server is gone, the client will try to use the last 10 bits of host ipv4 as to be the worker id. When the worker id of last 10 bits of host is still unvailable, the client will generate a random mask of max worker number and to generate a `dangerous` worker id which is only locally unique at current host rather than globally unique.
 
 ## The idworker server
 The idworker server is just a simple servlet running in embedded jetty container.
