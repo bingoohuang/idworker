@@ -2,27 +2,32 @@ package org.n3r.idworker;
 
 import org.junit.Test;
 import org.n3r.idworker.utils.IPv4;
+import org.n3r.idworker.utils.Utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BasedIpWorkerIdTest {
-    public static ClassLoader getClassLoader() {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        return contextClassLoader != null ? contextClassLoader : BasedIpWorkerIdTest.class.getClassLoader();
-    }
-
-
-    public static InputStream classResourceToStream(String resourceName) {
-        return getClassLoader().getResourceAsStream(resourceName);
-    }
 
     @Test
     public void test1() throws IOException {
-        InputStream inputStream = classResourceToStream("ess_tail_out.conf");
+        InputStream inputStream = Utils.classResourceToStream("mall2.conf");
+        computeUsableWorkerIds(inputStream);
+    }
+
+    @Test
+    public void test2() throws IOException {
+        InputStream inputStream = Utils.classResourceToStream("ecs3.conf");
+        computeUsableWorkerIds(inputStream);
+    }
+
+    protected void computeUsableWorkerIds(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         String line;
 
@@ -40,6 +45,7 @@ public class BasedIpWorkerIdTest {
 
     static long workerIdBits = 10L;
     static long maxWorkerId = -1L ^ (-1L << workerIdBits);
+
     private void computeWorkerIds(Set<Long> availableIds, String ip) {
         long lip = IPv4.toLong(ip);
         System.out.print(ip);
@@ -47,6 +53,7 @@ public class BasedIpWorkerIdTest {
         System.out.print(lip);
         System.out.print(',');
         long oid = lip & maxWorkerId;
+
         long id = oid;
         checkDuplicated(availableIds, id);
         id = id ^ 345L;
@@ -55,22 +62,8 @@ public class BasedIpWorkerIdTest {
         checkDuplicated(availableIds, id);
         id = id ^ 832L;
         checkDuplicated(availableIds, id);
-//        id = oid ^ 63L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 127L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 255L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 511L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 341L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 1023L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 93L;
-//        checkDuplicated(availableIds, id);
-//        id = oid ^ 345L;
-//        checkDuplicated(availableIds, id);
+        id = id ^ 992L;
+        checkDuplicated(availableIds, id);
         System.out.println();
     }
 
@@ -86,11 +79,10 @@ public class BasedIpWorkerIdTest {
     }
 
     static Pattern ipv4Pattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+
     public static String findIp(String line) {
         Matcher matcher = ipv4Pattern.matcher(line);
         if (matcher.find()) return matcher.group();
         return null;
     }
-
-
 }
