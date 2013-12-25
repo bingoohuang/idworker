@@ -7,7 +7,7 @@ Any order system need to create an unique order ID.
 
 Traditionally, we use `Oracle sequence` or `mysql auto-increment field`. And so we create sequence or mysql increment id table and prepare SQL to get an available unique id. And every time when we need a new id, we may need re-execute the SQL.
 
-Is there an easy one to provide unique IDs with un-coordinated, [k-sorted](http://ci.nii.ac.jp/naid/110002673489/), under-64bits and even no need ofID server?
+Is there an easy one to provide unique IDs with un-coordinated, [k-sorted](http://ci.nii.ac.jp/naid/110002673489/), under-64bits and even no need of ID server?
 
 Yes, we can make it.
 
@@ -33,7 +33,7 @@ We left one first bit to be zero and keep the generated ids always positive.
 
 ## Rationale
 
-And I have to confess that the orignial idea is from [twitter snowflake](https://github.com/twitter/snowflake).
+I have to confess that the orignial idea is from [twitter snowflake](https://github.com/twitter/snowflake).
 
 Within one process, we are of course sure it is simple to make all IDs generated unique. But within multiple processes on the one host, or even on multiple hosts, how to guarentee such global uniqueness? 
 
